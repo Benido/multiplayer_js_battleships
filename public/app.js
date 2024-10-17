@@ -131,13 +131,16 @@ document.addEventListener('DOMContentLoaded', () => {
     })  
 
     // Setup event listener for firing
+    function addFireEvent() {
+      if (currentPlayer === 'user' && ready && enemyReady) {
+        shotFired = this.dataset.id
+        socket.emit('fire', shotFired)
+        this.removeEventListener('click', addFireEvent)  //Prevent firing twice in the same square
+      }
+    }
+
     computerSquares.forEach(square => {
-      square.addEventListener('click', () => {
-        if (currentPlayer === 'user' && ready && enemyReady) {
-          shotFired = square.dataset.id
-          socket.emit('fire', shotFired)
-        }
-      })
+      square.addEventListener('click', addFireEvent)
     })
 
     // On fire received
@@ -179,7 +182,7 @@ document.addEventListener('DOMContentLoaded', () => {
     })
   }
 
-    //Create Board
+    // Create Board
   function createBoard(grid, squares) {
     for (let i = 0; i < width*width; i++) {
       const square = document.createElement('div')
@@ -188,7 +191,7 @@ document.addEventListener('DOMContentLoaded', () => {
       squares.push(square)
     }
   }
-  //Draw the computers ships in random locations
+  // Draw the computers ships in random locations
   function generate(ship) {
     let randomDirection = Math.floor(Math.random() * ship.directions.length)
     let current = ship.directions[randomDirection]
@@ -206,7 +209,7 @@ document.addEventListener('DOMContentLoaded', () => {
   }
   
 
-  //Rotate the ships
+  // Rotate the ships
   function rotate() {
     if (isHorizontal) {
       destroyer.classList.toggle('destroyer-container-vertical')
@@ -229,7 +232,7 @@ document.addEventListener('DOMContentLoaded', () => {
   }
   rotateButton.addEventListener('click', rotate)
 
-  //move around user ship
+  // Move around user ship
   ships.forEach(ship => ship.addEventListener('dragstart', dragStart))
   userSquares.forEach(square => square.addEventListener('dragstart', dragStart))
   userSquares.forEach(square => square.addEventListener('dragover', dragOver))
@@ -337,14 +340,17 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   // Game logic for single player
+  function addFireEventSingle() {    
+    shotFired = this.dataset.id
+    revealSquare(this.classList)
+    this.removeEventListener('click', addFireEventSingle) // Prevent firing twice in the same square
+  }
+
   function playGameSingle() {
     if (isGameOver) return
     if (currentPlayer === 'user') {
       turnDisplay.innerHTML = 'Votre tour'
-      computerSquares.forEach(square => square.addEventListener('click', function(e) {
-        shotFired = square.dataset.id
-        revealSquare(square.classList)
-      }))
+      computerSquares.forEach(square => square.addEventListener('click', addFireEventSingle))
     }
     if (currentPlayer === 'enemy') {
       turnDisplay.innerHTML = 'Ordinateur, Go'

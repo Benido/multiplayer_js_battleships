@@ -68,7 +68,7 @@ io.on('connection', socket => {
 
   // On fire received
   socket.on('fire', id => {
-    console.log(`Shot fired from ${playerIndex}`, id)
+    console.log(`Shot fired from p${parseInt(playerIndex) + 1}`, id)
 
     // Emit to the other player
     socket.broadcast.emit('fire', id)

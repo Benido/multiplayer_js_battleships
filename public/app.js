@@ -126,7 +126,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Ready button click
     startButton.addEventListener('click', () => {
-      if (allShipPlaced) playGameMulti(socket)
+      if (allShipPlaced) {
+        playGameMulti(socket)
+        turnDisplay.style.display = 'block'
+      }
       else infoDisplay.innerHTML = 'Merci de placer tous vos bateaux' 
     })  
 
@@ -175,6 +178,7 @@ document.addEventListener('DOMContentLoaded', () => {
     startButton.addEventListener('click', () => {
       if (allShipPlaced) {
         setupButtons.style.display = 'none'
+        turnDisplay.style.display = 'block'
         playGameSingle()
       } else {
         turnDisplay.innerHTML = 'Veuillez placer tous vos bateaux'

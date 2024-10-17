@@ -286,3 +286,7 @@ body {
   opacity: 1;
   text-decoration: none;
 }
+
+#new-game {
+  display: none;
+}

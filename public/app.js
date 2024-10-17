@@ -13,6 +13,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const turnDisplay = document.querySelector('#whose-go')
   const infoDisplay = document.querySelector('#info')
   const setupButtons = document.querySelector('.setup-buttons')
+  const newGameButton = document.getElementById('new-game')
   const userSquares = []
   const computerSquares = []
   let isHorizontal = true
@@ -169,8 +170,12 @@ document.addEventListener('DOMContentLoaded', () => {
     generate(shipArray[4])
 
     startButton.addEventListener('click', () => {
-      setupButtons.style.display = 'none'
-      playGameSingle()
+      if (allShipPlaced) {
+        setupButtons.style.display = 'none'
+        playGameSingle()
+      } else {
+        turnDisplay.innerHTML = 'Veuillez placer tous vos bateaux'
+      }
     })
   }
 
@@ -257,7 +262,7 @@ document.addEventListener('DOMContentLoaded', () => {
   function dragLeave() {
   }
 
-  function dragDrop() {
+  function dragDrop() {  //TODO Refactoriser
     let shipNameWithLastId = draggedShip.lastChild.id
     let shipClass = shipNameWithLastId.slice(0, -2)
     let lastShipIndex = parseInt(shipNameWithLastId.substr(-1))
@@ -274,6 +279,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
     if (isHorizontal && !newNotAllowedHorizontal.includes(shipLastId)) {
       for (let i=0; i < draggedShipLength; i++) {
+        if (userSquares[parseInt(this.dataset.id) - selectedShipIndex + i].classList.contains('taken')) return
+      }
+
+      for (let i=0; i < draggedShipLength; i++) {
         let directionClass
         if (i === 0) directionClass = 'start'
         if (i === draggedShipLength - 1) directionClass = 'end'
@@ -282,6 +291,10 @@ document.addEventListener('DOMContentLoaded', () => {
     // As long as the index of the ship you are dragging is not in the newNotAllowedVertical array! This means that sometimes if you drag the ship by its
     // index-1 , index-2 and so on, the ship will rebound back to the displayGrid.
     } else if (!isHorizontal && !newNotAllowedVertical.includes(shipLastId)) {
+      for (let i=0; i < draggedShipLength; i++) {
+        if (userSquares[parseInt(this.dataset.id) - selectedShipIndex + width*i].classList.contains('taken')) return
+      }
+
       for (let i=0; i < draggedShipLength; i++) {
         let directionClass
         if (i === 0) directionClass = 'start'
@@ -358,8 +371,10 @@ document.addEventListener('DOMContentLoaded', () => {
     }
     if (obj.includes('taken')) {
       enemySquare.classList.add('boom')
+      infoDisplay.innerHTML = 'Vous touchez un navire ennemi'
     } else {
       enemySquare.classList.add('miss')
+      infoDisplay.innerHTML = 'Votre tir tombe à l&apos;eau'
     }
     checkForWins()
     currentPlayer = 'enemy'
@@ -378,11 +393,27 @@ document.addEventListener('DOMContentLoaded', () => {
     if (!userSquares[square].classList.contains('boom')) {
       const hit = userSquares[square].classList.contains('taken')
       userSquares[square].classList.add(hit ? 'boom' : 'miss')
-      if (userSquares[square].classList.contains('destroyer')) cpuDestroyerCount++
-      if (userSquares[square].classList.contains('submarine')) cpuSubmarineCount++
-      if (userSquares[square].classList.contains('cruiser')) cpuCruiserCount++
-      if (userSquares[square].classList.contains('battleship')) cpuBattleshipCount++
-      if (userSquares[square].classList.contains('carrier')) cpuCarrierCount++
+      infoDisplay.innerHTML = !hit ? 'Le tir ennemi tombe à l&apos;eau' : ''
+      if (userSquares[square].classList.contains('destroyer')) {
+        cpuDestroyerCount++
+        infoDisplay.innerHTML = 'Votre destroyer est touché'
+      }
+      if (userSquares[square].classList.contains('submarine')) {
+        cpuSubmarineCount++
+        infoDisplay.innerHTML = 'Votre sous-marin est touché'
+      }
+      if (userSquares[square].classList.contains('cruiser')) {
+        cpuCruiserCount++
+        infoDisplay.innerHTML = 'Votre croiseur est touché'
+      }
+      if (userSquares[square].classList.contains('battleship')) {
+        cpuBattleshipCount++
+        infoDisplay.innerHTML = 'Votre cuirassé est touché'
+      }
+      if (userSquares[square].classList.contains('carrier')) {
+        cpuCarrierCount++
+        infoDisplay.innerHTML = 'Votre porte-avion est touché'
+      }
       checkForWins()
     } else if (gameMode === 'singlePlayer') enemyGo()
     currentPlayer = 'user'
@@ -445,6 +476,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
   function gameOver() {
     isGameOver = true
-    startButton.removeEventListener('click', playGameSingle)
+    //startButton.removeEventListener('click', playGameSingle)
+    newGameButton.style.display = 'block'
+    newGameButton.addEventListener('click', () => location.reload())
   }
 })

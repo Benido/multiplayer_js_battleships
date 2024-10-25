@@ -237,7 +237,8 @@ document.addEventListener('DOMContentLoaded', () => {
   rotateButton.addEventListener('click', rotate)
 
   // Move around user ship
-  ships.forEach(ship => ship.addEventListener('dragstart', dragStart))
+
+  ships.forEach(ship => ship.addEventListener('dragstart', dragStart)) 
   userSquares.forEach(square => square.addEventListener('dragstart', dragStart))
   userSquares.forEach(square => square.addEventListener('dragover', dragOver))
   userSquares.forEach(square => square.addEventListener('dragenter', dragEnter))
@@ -253,16 +254,18 @@ document.addEventListener('DOMContentLoaded', () => {
     selectedShipNameWithIndex = e.target.id
   }))
 
-  function dragStart() {
+  function dragStart(e) {
     draggedShip = this
-    draggedShipLength = this.childNodes.length
+    draggedShipLength = this.childNodes.length    
   }
 
   function dragOver(e) {
+    //necessary for allowing the drop
     e.preventDefault()
   }
 
   function dragEnter(e) {
+    //necessary for allowing the drop
     e.preventDefault()
   }
 
@@ -272,20 +275,25 @@ document.addEventListener('DOMContentLoaded', () => {
   function dragDrop() {  //TODO Refactoriser
     let shipNameWithLastId = draggedShip.lastChild.id
     let shipClass = shipNameWithLastId.slice(0, -2)
-    let lastShipIndex = parseInt(shipNameWithLastId.substr(-1))
-    let shipLastId = lastShipIndex + parseInt(this.dataset.id)
-    const notAllowedHorizontal = [0,10,20,30,40,50,60,70,80,90,1,11,21,31,41,51,61,71,81,91,2,22,32,42,52,62,72,82,92,3,13,23,33,43,53,63,73,83,93]
-    const notAllowedVertical = [99,98,97,96,95,94,93,92,91,90,89,88,87,86,85,84,83,82,81,80,79,78,77,76,75,74,73,72,71,70,69,68,67,66,65,64,63,62,61,60]
+    let lastShipIndex = parseInt(shipNameWithLastId.slice(-1))
+    let selectedShipIndex = parseInt(selectedShipNameWithIndex.slice(-1))
+    isHorizontal ? 
+      shipLastId = parseInt(this.dataset.id) + lastShipIndex - selectedShipIndex :
+      shipLastId = parseInt(this.dataset.id) + width * (lastShipIndex - selectedShipIndex )
     
-    let newNotAllowedHorizontal = notAllowedHorizontal.splice(0, 10 * lastShipIndex)
-    let newNotAllowedVertical = notAllowedVertical.splice(0, 10 * lastShipIndex)
+    const notAllowedHorizontal = [0,10,20,30,40,50,60,70,80,90,1,11,21,31,41,51,61,71,81,91,2,22,32,42,52,62,72,82,92,3,13,23,33,43,53,63,73,83,93]       
+      
+    console.log('this', this)
+    console.log('shipLastId' , shipLastId)
+    console.log('lastShipIndex', lastShipIndex)
+    console.log('selectedShipIndex', selectedShipIndex)
 
-    selectedShipIndex = parseInt(selectedShipNameWithIndex.substr(-1))
-
-    shipLastId = shipLastId - selectedShipIndex
-
+    let newNotAllowedHorizontal = notAllowedHorizontal.splice(0, 10 * lastShipIndex)    
+    
+    // Checks if the ship fits into the grid
     if (isHorizontal && !newNotAllowedHorizontal.includes(shipLastId)) {
       for (let i=0; i < draggedShipLength; i++) {
+        //Checks if one of the square is already taken
         if (userSquares[parseInt(this.dataset.id) - selectedShipIndex + i].classList.contains('taken')) return
       }
 
@@ -295,18 +303,20 @@ document.addEventListener('DOMContentLoaded', () => {
         if (i === draggedShipLength - 1) directionClass = 'end'
         userSquares[parseInt(this.dataset.id) - selectedShipIndex + i].classList.add('taken', 'horizontal', directionClass, shipClass)
       }
-    // As long as the index of the ship you are dragging is not in the newNotAllowedVertical array! This means that sometimes if you drag the ship by its
-    // index-1 , index-2 and so on, the ship will rebound back to the displayGrid.
-    } else if (!isHorizontal && !newNotAllowedVertical.includes(shipLastId)) {
+    // Checks if the ship fits into the grid
+    } else if (!isHorizontal && shipLastId < 100) {
       for (let i=0; i < draggedShipLength; i++) {
-        if (userSquares[parseInt(this.dataset.id) - selectedShipIndex + width*i].classList.contains('taken')) return
+        
+        //Checks if one of the square is already taken
+        if (userSquares[parseInt(this.dataset.id) + width * (i - selectedShipIndex)].classList.contains('taken')) return
       }
 
       for (let i=0; i < draggedShipLength; i++) {
         let directionClass
         if (i === 0) directionClass = 'start'
         if (i === draggedShipLength - 1) directionClass = 'end'
-        userSquares[parseInt(this.dataset.id) - selectedShipIndex + width*i].classList.add('taken', 'vertical', directionClass, shipClass)
+
+        userSquares[parseInt(this.dataset.id) + width * (i - selectedShipIndex)].classList.add('taken', 'vertical', directionClass, shipClass)
       }
     } else return
 

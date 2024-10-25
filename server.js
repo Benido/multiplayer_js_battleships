@@ -76,7 +76,7 @@ io.on('connection', socket => {
 
   // On fire reply
   socket.on('fire-reply', square => {
-    console.log(square)
+    //console.log(square)
 
     // Forward the reply to other player
     socket.broadcast.emit('fire-reply', square)
@@ -87,5 +87,5 @@ io.on('connection', socket => {
     connections[playerIndex] = null
     socket.emit('timeout')
     socket.disconnect()
-  }, 600000) // 10 minutes limit per player
+  }, 900000) // 10 minutes limit per player
 })

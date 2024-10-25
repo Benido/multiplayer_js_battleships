@@ -148,9 +148,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // On fire received
     socket.on('fire', id => {
-      enemyGo(id)
+      
       const square = userSquares[id]
       socket.emit('fire-reply', square.classList)
+      enemyGo(id)
       playGameMulti(socket)
     })
 
@@ -283,10 +284,10 @@ document.addEventListener('DOMContentLoaded', () => {
     
     const notAllowedHorizontal = [0,10,20,30,40,50,60,70,80,90,1,11,21,31,41,51,61,71,81,91,2,22,32,42,52,62,72,82,92,3,13,23,33,43,53,63,73,83,93]       
       
-    console.log('this', this)
+    /* console.log('this', this)
     console.log('shipLastId' , shipLastId)
     console.log('lastShipIndex', lastShipIndex)
-    console.log('selectedShipIndex', selectedShipIndex)
+    console.log('selectedShipIndex', selectedShipIndex) */
 
     let newNotAllowedHorizontal = notAllowedHorizontal.splice(0, 10 * lastShipIndex)    
     
@@ -477,7 +478,7 @@ document.addEventListener('DOMContentLoaded', () => {
       cpuCruiserCount = 10
     }
     if (cpuBattleshipCount === 4) {
-      infoDisplay.innerHTML = `L&apos;${enemy} acoulé votre cuirassé`
+      infoDisplay.innerHTML = `L&apos;${enemy} a coulé votre cuirassé`
       cpuBattleshipCount = 10
     }
     if (cpuCarrierCount === 5) {
@@ -485,11 +486,11 @@ document.addEventListener('DOMContentLoaded', () => {
       cpuCarrierCount = 10
     }
     if ((destroyerCount + submarineCount + cruiserCount + battleshipCount + carrierCount) === 50) {
-      infoDisplay.innerHTML = "VOUS AVEZ GAGNÉ !"
+      infoDisplay.innerHTML = 'VOUS AVEZ GAGNÉ !'        
       gameOver()
     }
     if ((cpuDestroyerCount + cpuSubmarineCount + cpuCruiserCount + cpuBattleshipCount + cpuCarrierCount) === 50) {
-      infoDisplay.innerHTML = `L&apos;${enemy.toUpperCase()} A GAGNÉ ! `
+      infoDisplay.innerHTML = `L&apos;${enemy.toUpperCase()} A GAGNÉ !`      
       gameOver()
     }
   }
@@ -497,6 +498,7 @@ document.addEventListener('DOMContentLoaded', () => {
   function gameOver() {
     isGameOver = true
     //startButton.removeEventListener('click', playGameSingle)
+    turnDisplay.innerHTML = ''
     newGameButton.style.display = 'block'
     newGameButton.addEventListener('click', () => location.reload())
   }

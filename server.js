@@ -66,6 +66,11 @@ io.on('connection', socket => {
     socket.emit('check-players', players)
   })
 
+  // On change of pseudo
+  socket.on('pseudo-change', pseudo => {
+    socket.broadcast.emit('enemy-pseudo', pseudo)
+  })
+
   // On fire received
   socket.on('fire', id => {
     console.log(`Shot fired from p${parseInt(playerIndex) + 1}`, id)

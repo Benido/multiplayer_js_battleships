@@ -14,6 +14,8 @@ document.addEventListener('DOMContentLoaded', () => {
   const infoDisplay = document.querySelector('#info')
   const setupButtons = document.querySelector('.setup-buttons')
   const newGameButton = document.getElementById('new-game')
+  const pseudoInput = document.getElementById('pseudo')
+  const pseudoButton = document.getElementById('send-pseudo')
   const userSquares = []
   const computerSquares = []
   let isHorizontal = true
@@ -25,6 +27,8 @@ document.addEventListener('DOMContentLoaded', () => {
   let enemyReady = false
   let allShipPlaced = false
   let shotFired = -1
+  let playerPseudo = 'Joueur 1'
+  let enemyPseudo = 'Joueur 2'
 
     //Ships
   const shipArray = [
@@ -119,9 +123,27 @@ document.addEventListener('DOMContentLoaded', () => {
       })
     })
 
+    // Change pseudo  
+    pseudoButton.addEventListener('click', (e) => {
+      let player = `.p${parseInt(playerNum) + 1}`
+      let pseudo = pseudoInput.value.trim().replace(/[<>]/g, '')
+      document.querySelector(player + ' .pseudo').innerHTML = pseudo      
+      playerPseudo = pseudo
+      socket.emit('pseudo-change', pseudo)
+      e.target.blur()
+
+    })
+
+    // Change enemy pseudo
+    socket.on('enemy-pseudo', pseudo => {
+      let enemy = `.p${parseInt(playerNum === 0 ? 1 : 0 ) + 1}`
+      enemyPseudo = pseudo
+      document.querySelector(enemy + ' .pseudo').innerHTML = pseudo
+    })
+
     // On timeout
     socket.on('timeout', () => {
-      infoDisplay.innerHTML = 'Vous avez atteint la limite de 10 minutes'
+      infoDisplay.innerHTML = 'Vous avez atteint la limite de 15 minutes'
     })
 
     // Ready button click
@@ -442,47 +464,47 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   function checkForWins() {
-    let enemy = 'ordinateur'
-    if (gameMode === 'multiPlayer') enemy = 'adversaire'
+    let enemy = 'l&apos;ordinateur'
+    if (gameMode === 'multiPlayer') enemy = enemyPseudo
 
     if (destroyerCount === 2) {
-      infoDisplay.innerHTML = `Vous avez coulé le destroyer de l&apos;${enemy}`
+      infoDisplay.innerHTML = `Vous avez coulé le destroyer de ${enemy}`
       destroyerCount = 10
     }
     if (submarineCount === 3) {
-      infoDisplay.innerHTML = `Vous avez coulé le sous-marin de l&apos;${enemy}`
+      infoDisplay.innerHTML = `Vous avez coulé le sous-marin de ${enemy}`
       submarineCount = 10
     }
     if (cruiserCount === 3) {
-      infoDisplay.innerHTML = `Vous avez coulé le croiseur de l&apos;${enemy}`
+      infoDisplay.innerHTML = `Vous avez coulé le croiseur de ${enemy}`
       cruiserCount = 10
     }
     if (battleshipCount === 4) {
-      infoDisplay.innerHTML = `Vous avez coulé le cuirassé de l&apos;${enemy}`
+      infoDisplay.innerHTML = `Vous avez coulé le cuirassé de ${enemy}`
       battleshipCount = 10
     }
     if (carrierCount === 5) {
-      infoDisplay.innerHTML = `Vous avez coulé le porte-avion de l&apos;${enemy}`
+      infoDisplay.innerHTML = `Vous avez coulé le porte-avion de ${enemy}`
       carrierCount = 10
     }
     if (cpuDestroyerCount === 2) {
-      infoDisplay.innerHTML = `L&apos;${enemy} a coulé votre destroyer`
+      infoDisplay.innerHTML = `${enemy} a coulé votre destroyer`
       cpuDestroyerCount = 10
     }
     if (cpuSubmarineCount === 3) {
-      infoDisplay.innerHTML = `L&apos;${enemy} a coulé votre sous-marin`
+      infoDisplay.innerHTML = `${enemy} a coulé votre sous-marin`
       cpuSubmarineCount = 10
     }
     if (cpuCruiserCount === 3) {
-      infoDisplay.innerHTML = `L&apos;${enemy} a coulé votre croiseur`
+      infoDisplay.innerHTML = `${enemy} a coulé votre croiseur`
       cpuCruiserCount = 10
     }
     if (cpuBattleshipCount === 4) {
-      infoDisplay.innerHTML = `L&apos;${enemy} a coulé votre cuirassé`
+      infoDisplay.innerHTML = `${enemy} a coulé votre cuirassé`
       cpuBattleshipCount = 10
     }
     if (cpuCarrierCount === 5) {
-      infoDisplay.innerHTML = `L&apos;${enemy} a coulé votre porte-avion`
+      infoDisplay.innerHTML = `${enemy} a coulé votre porte-avion`
       cpuCarrierCount = 10
     }
     if ((destroyerCount + submarineCount + cruiserCount + battleshipCount + carrierCount) === 50) {

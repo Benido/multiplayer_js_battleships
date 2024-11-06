@@ -230,8 +230,17 @@ document.addEventListener('DOMContentLoaded', () => {
     const isAtRightEdge = current.some(index => (randomStart + index) % width === width - 1)
     const isAtLeftEdge = current.some(index => (randomStart + index) % width === 0)
 
-    if (!isTaken && !isAtRightEdge && !isAtLeftEdge) current.forEach(index => computerSquares[randomStart + index].classList.add('taken', ship.name))
-
+    if (!isTaken && !isAtRightEdge && !isAtLeftEdge) { 
+      current.forEach(index => {      
+        computerSquares[randomStart + index].classList.add(
+          'taken', 
+          ship.name, 
+          randomDirection === 0 ? 'horizontal' : 'vertical',
+          index === 0 ? 'start' : 
+            index === current[current.length - 1] ? 'end' : 'middle',          
+        )
+      })
+}
     else generate(ship)
   }
   
@@ -311,9 +320,9 @@ document.addEventListener('DOMContentLoaded', () => {
     console.log('lastShipIndex', lastShipIndex)
     console.log('selectedShipIndex', selectedShipIndex) */
 
-    let newNotAllowedHorizontal = notAllowedHorizontal.splice(0, 10 * lastShipIndex)    
+    let newNotAllowedHorizontal = notAllowedHorizontal.splice(0, width * lastShipIndex)    
     
-    // Checks if the ship fits into the grid
+    // Checks if the horizontal ship fits into the grid
     if (isHorizontal && !newNotAllowedHorizontal.includes(shipLastId)) {
       for (let i=0; i < draggedShipLength; i++) {
         //Checks if one of the square is already taken
@@ -326,8 +335,8 @@ document.addEventListener('DOMContentLoaded', () => {
         if (i === draggedShipLength - 1) directionClass = 'end'
         userSquares[parseInt(this.dataset.id) - selectedShipIndex + i].classList.add('taken', 'horizontal', directionClass, shipClass)
       }
-    // Checks if the ship fits into the grid
-    } else if (!isHorizontal && shipLastId < 100) {
+    // Checks if the vertical ship fits into the grid
+    } else if (!isHorizontal && shipLastId < width * width) {
       for (let i=0; i < draggedShipLength; i++) {
         
         //Checks if one of the square is already taken
@@ -469,22 +478,27 @@ document.addEventListener('DOMContentLoaded', () => {
 
     if (destroyerCount === 2) {
       infoDisplay.innerHTML = `Vous avez coulé le destroyer de ${enemy}`
+      sunkenShip('destroyer')
       destroyerCount = 10
     }
     if (submarineCount === 3) {
       infoDisplay.innerHTML = `Vous avez coulé le sous-marin de ${enemy}`
+      sunkenShip('submarine')
       submarineCount = 10
     }
     if (cruiserCount === 3) {
       infoDisplay.innerHTML = `Vous avez coulé le croiseur de ${enemy}`
+      sunkenShip('cruiser')
       cruiserCount = 10
     }
     if (battleshipCount === 4) {
       infoDisplay.innerHTML = `Vous avez coulé le cuirassé de ${enemy}`
+      sunkenShip('battleship')
       battleshipCount = 10
     }
     if (carrierCount === 5) {
       infoDisplay.innerHTML = `Vous avez coulé le porte-avion de ${enemy}`
+      sunkenShip('carrier')
       carrierCount = 10
     }
     if (cpuDestroyerCount === 2) {
@@ -516,6 +530,13 @@ document.addEventListener('DOMContentLoaded', () => {
       gameOver()
     }
   }
+
+  function sunkenShip(shipClass) {
+    const shipSquares = computerGrid.querySelectorAll('.' + shipClass)
+    shipSquares.forEach((square) => {
+      square.classList.add('sunken')      
+    })
+  }  
 
   function gameOver() {
     isGameOver = true

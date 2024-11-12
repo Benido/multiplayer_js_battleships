@@ -254,7 +254,7 @@ body {
   position: absolute;
   width: 4.6vmin;
   height: 4.6vmin;
-  background-color: rgba(255, 0, 0, 0.5);
+  animation: sunk 3s linear 0.5s forwards
 }
 
 @keyframes hit {
@@ -276,6 +276,12 @@ body {
 
   100% {
     background-color: hsl(0, 0%, 80%);
+  }  
+}
+
+@keyframes sunk {
+  to {    
+    background-color: rgba(255, 0, 0, 0.5);
   }  
 }
 

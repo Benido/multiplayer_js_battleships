@@ -160,7 +160,7 @@ document.addEventListener('DOMContentLoaded', () => {
       if (currentPlayer === 'user' && ready && enemyReady) {
         shotFired = this.dataset.id
         socket.emit('fire', shotFired)
-        this.removeEventListener('click', addFireEvent)  //Prevent firing twice in the same square
+        this.removeEventListener('click', addFireEvent)  //Prevents firing twice in the same square
       }
     }
 
@@ -389,7 +389,7 @@ document.addEventListener('DOMContentLoaded', () => {
   function addFireEventSingle() {    
     shotFired = this.dataset.id
     revealSquare(this.classList)
-    this.removeEventListener('click', addFireEventSingle) // Prevent firing twice in the same square
+    this.removeEventListener('click', addFireEventSingle) // Prevents firing twice in the same square
   }
 
   function playGameSingle() {
@@ -414,6 +414,7 @@ document.addEventListener('DOMContentLoaded', () => {
   function revealSquare(classList) {
     const enemySquare = computerGrid.querySelector(`div[data-id='${shotFired}']`)
     const obj = Object.values(classList)
+    if (gameMode === 'multiPlayer') enemySquare.classList.add(...obj)
     if (!enemySquare.classList.contains('boom') && currentPlayer === 'user' && !isGameOver) {
       if (obj.includes('destroyer')) destroyerCount++
       if (obj.includes('submarine')) submarineCount++

@@ -192,11 +192,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // Single Player
   function startSinglePlayer() {
-    generate(shipArray[0])
-    generate(shipArray[1])
-    generate(shipArray[2])
-    generate(shipArray[3])
-    generate(shipArray[4])
+    generate(shipArray[0], computerSquares)
+    generate(shipArray[1], computerSquares)
+    generate(shipArray[2], computerSquares)
+    generate(shipArray[3], computerSquares)
+    generate(shipArray[4], computerSquares)
 
     startButton.addEventListener('click', () => {
       if (allShipPlaced) {
@@ -219,20 +219,20 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   }
   // Draw the computers ships in random locations
-  function generate(ship) {
+  function generate(ship, squares) {
     let randomDirection = Math.floor(Math.random() * ship.directions.length)
     let current = ship.directions[randomDirection]
     if (randomDirection === 0) direction = 1
     if (randomDirection === 1) direction = 10
-    let randomStart = Math.abs(Math.floor(Math.random() * computerSquares.length - (ship.directions[0].length * direction)))
+    let randomStart = Math.abs(Math.floor(Math.random() * squares.length - (ship.directions[0].length * direction)))
 
-    const isTaken = current.some(index => computerSquares[randomStart + index].classList.contains('taken'))
+    const isTaken = current.some(index => squares[randomStart + index].classList.contains('taken'))
     const isAtRightEdge = current.some(index => (randomStart + index) % width === width - 1)
     const isAtLeftEdge = current.some(index => (randomStart + index) % width === 0)
 
     if (!isTaken && !isAtRightEdge && !isAtLeftEdge) { 
       current.forEach(index => {      
-        computerSquares[randomStart + index].classList.add(
+        squares[randomStart + index].classList.add(
           'taken', 
           ship.name, 
           randomDirection === 0 ? 'horizontal' : 'vertical',
@@ -241,9 +241,27 @@ document.addEventListener('DOMContentLoaded', () => {
         )
       })
 }
-    else generate(ship)
+    else generate(ship, squares)
   }
   
+  //Random ship placement for user
+  const randomButton = document.getElementById('random')
+  randomButton.addEventListener('click', (e) => {
+    userSquares.forEach(square => square.classList.remove(...square.classList))  //clear the grid of previous boats
+
+    generate(shipArray[0], userSquares)
+    generate(shipArray[1], userSquares)
+    generate(shipArray[2], userSquares)
+    generate(shipArray[3], userSquares)
+    generate(shipArray[4], userSquares)
+
+    displayGrid.style.display = 'none'
+    rotateButton.style.display = 'none'
+    allShipPlaced = true
+
+    e.target.blur() //reset focus
+
+  })
 
   // Rotate the ships
   function rotate() {
